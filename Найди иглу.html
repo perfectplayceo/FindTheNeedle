@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Найди иголку</title>
+<style>
+:root{--bg:#f4efe2;--fg:#2b2616;--card:#fffaf0;--ac:#c58a12;--bd:#d8cba8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1a14;--fg:#efe7d0;--card:#27241b;--ac:#e0a521;--bd:#443e2c}}
+:root[data-theme="dark"]{--bg:#1c1a14;--fg:#efe7d0;--card:#27241b;--ac:#e0a521;--bd:#443e2c}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif}
+#app{max-width:980px;margin:0 auto;padding:8px}
+#hud{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:6px}
+#cash{font-size:22px;font-weight:700;color:var(--ac)}
+canvas{width:100%;max-width:700px;display:block;touch-action:none;border:1px solid var(--bd);border-radius:8px;cursor:crosshair}
+#msg{min-height:20px;font-weight:600}
+#hint{font-size:13px;opacity:.75;margin:4px 0 8px}
+h3{margin:12px 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.05em;opacity:.7}
+.grp{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+button.up{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px;text-align:left;font:inherit;cursor:pointer}
+button.up:disabled{opacity:.45;cursor:not-allowed}
+button.up:not(:disabled):hover{border-color:var(--ac)}
+button.up small{display:block;opacity:.75}
+button.up b{color:var(--ac)}
+#menu{position:fixed;inset:0;background:var(--bg);z-index:9;display:flex;justify-content:center;overflow:auto;padding:calc(12px + env(safe-area-inset-top,0px)) 12px 12px}
+.box{max-width:560px;width:100%}
+.slot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px;margin-bottom:6px}
+.slot small{display:block;opacity:.75}
+.sb{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer}
+.sb.on{border-color:var(--ac);color:var(--ac);font-weight:700}
+.sizes{display:flex;flex-wrap:wrap;gap:6px}
+textarea{width:100%;box-sizing:border-box;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:6px;margin-bottom:6px}
+.gen label{display:block;margin:4px 0}.gen input,.gen select{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:6px;padding:4px;font:inherit;width:140px}#acp{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}#tc{margin-top:6px;cursor:default}
+</style></head><body><div id="app">
+<div id="hud"><span id="cash">$0</span><span id="info"></span><button class="sb" id="mbtn">☰ Меню</button><button class="sb" id="sbtn">Сохранить</button></div>
+<canvas id="c" width="700" height="600"></canvas>
+<div id="msg"></div>
+<canvas id="tc" width="700" height="180"></canvas>
+<div id="acp" style="display:none">🤖 Автокликер <button class="sb" id="acb">Вкл</button> мощность <input type="range" id="acr" min="10" max="100" step="5"> <span id="acv"></span></div>
+<div id="bsp" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0">🔎 Бинарный поиск <button class="sb" id="bpb">Запрос</button> <button class="sb" id="bpr">Сброс</button> <span id="bpv"></span></div>
+<div id="qz"><h3>🎓 Задача по информатике</h3><div id="qt" style="font-weight:600;margin:4px 0"></div><div id="qo" class="sizes"></div><button class="sb" id="qn" style="margin-top:6px">Получить задачу</button> <span id="qs"></span></div>
+<div id="hint">Зажми мышь или палец на стоге — копаешь, сено летит на ленту. Каждые T секунд лента сбрасывает партию в переработку. Металлоискатель (купи за $10K) пищит у иголки и у мусора. Тюки с пресса копятся на складе справа под стогом — когда приедет грузовик, перетащи их в кузов. Автокликер и руки открываются в улучшениях. Нашёл иголку — престиж и стог плотнее. Информатика: купи «Бинарный поиск» — каждый запрос делит диапазон клеток пополам (как в алгоритме бинарного поиска), а задачи по информатике дают бонус.</div>
+<div id="ups"></div>
+<div id="menu"><div class="box"><h2>🪡 Найди иголку</h2><h3>Слоты сохранения</h3><div id="slots"></div><h3>Размер стога (для новой игры)</h3><div class="sizes" id="sizes"></div><h3>Резервная копия</h3><textarea id="code" rows="3" placeholder="Код сохранения"></textarea><button class="sb" id="exp">Экспорт текущей игры</button> <button class="sb" id="imp">Импорт кода</button><h3>Генератор кода сохранения</h3><div class="gen"><label>Деньги <input id="gc" type="number" value="0" min="0"></label><label>Престиж <input id="gp" type="number" value="0" min="0"></label><label>Раунд (0–30) <input id="gr" type="number" value="0" min="0" max="30"></label><label>Уровень всех улучшений <input id="gl" type="number" value="0" min="0"></label><label>Стог <select id="gs"></select></label></div><button class="sb" id="gen">Сгенерировать код</button><div id="mm" style="min-height:22px;margin:8px 0"></div><button class="sb" id="resume" style="display:none">▶ Продолжить игру</button></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id),cv=$('c'),x=cv.getContext('2d');
+const W=48,H=30,CS=14,OX=14,OY=10;
+const N=[
+{id:'cyc',g:'Конвейер',n:'Быстрый привод',st:'cyc',op:'more',p:.836,max:10,b:40,k:1.5,d:'время цикла ×0.836'},
+{id:'cap',g:'Конвейер',n:'Вместимость ленты',st:'cap',op:'add',p:10,max:25,b:30,k:1.3,d:'+10 ед.'},
+{id:'rad',g:'Копание',n:'Радиус лопаты',st:'rad',op:'add',p:.5,max:10,b:50,k:1.45,d:'+0.5 клетки'},
+{id:'dig',g:'Копание',n:'Скорость копания',st:'dig',op:'inc',p:.25,max:15,b:60,k:1.4,d:'+25%'},
+{id:'dU',g:'Сканеры',n:'Металлоискатель (покупка)',st:'x',op:'add',p:1,max:1,b:10000,k:1,d:'открывает металлоискатель'},
+{id:'det',g:'Сканеры',n:'Дальность металлоискателя',st:'det',op:'add',p:3,max:8,b:70,k:1.5,d:'+3 клетки дальности',req:'dU'},
+{id:'acc',g:'Сканеры',n:'Рентген-сканер',st:'acc',op:'add',p:.05,max:6,b:150,k:1.8,d:'+5% точности'},
+{id:'bin',g:'Алгоритмы',n:'Бинарный поиск (покупка)',st:'x',op:'add',p:1,max:1,b:1500,k:1,d:'зонд делит область поиска пополам: ≤ 11 шагов вместо 1440'},
+{id:'bpc',g:'Алгоритмы',n:'Оптимизация запросов',st:'bpc',op:'more',p:.8,max:5,b:800,k:1.6,d:'запрос зонда дешевле ×0.8',req:'bin'},
+{id:'vac',g:'Автоматизация',n:'Вакуумные трубы',st:'F',op:'add',p:4,max:15,b:200,k:1.35,d:'+4 ед/с'},
+{id:'drn',g:'Автоматизация',n:'Рой дронов',st:'F',op:'add',p:8,max:15,b:900,k:1.38,d:'+8 ед/с',req:'vac'},
+{id:'exc',g:'Автоматизация',n:'Экскаватор',st:'F',op:'add',p:30,max:10,b:5000,k:1.5,d:'+30 ед/с',req:'drn'},
+{id:'pap',g:'Переработка',n:'Бумажная фабрика',st:'pap',op:'add',p:1,max:1,b:400,k:1,d:'открывает бумагу'},
+{id:'pel',g:'Переработка',n:'Завод пеллет',st:'pel',op:'add',p:1,max:1,b:4000,k:1,d:'открывает пеллеты',req:'pap'},
+{id:'qb',g:'Переработка',n:'Мощность пресса',st:'qb',op:'add',p:5,max:20,b:60,k:1.3,d:'+5 ед/с'},
+{id:'qp',g:'Переработка',n:'Мощность бумаги',st:'qp',op:'add',p:4,max:20,b:500,k:1.32,d:'+4 ед/с',req:'pap'},
+{id:'qq',g:'Переработка',n:'Мощность пеллет',st:'qq',op:'add',p:3,max:20,b:5000,k:1.34,d:'+3 ед/с',req:'pel'},
+{id:'sel',g:'Экономика',n:'Цена продажи',st:'sel',op:'inc',p:.15,max:20,b:100,k:1.3,d:'+15%'},
+{id:'ak',g:'Автокликер',n:'Автокликер',st:'x',op:'add',p:1,max:1,b:10000,k:1,d:'копает сам; мощность настраивается ползунком'},
+{id:'akp',g:'Автокликер',n:'Потолок мощности',st:'x',op:'add',p:1,max:10,b:15000,k:1.6,d:'+5% макс. силы (всего до 65% от ручного)',req:'ak'},
+{id:'h1',g:'Руки',n:'Малая рука',st:'x',op:'add',p:1,max:6,b:600,k:1.45,d:'берёт горсть сена и кладёт на ленту'},
+{id:'h2',g:'Руки',n:'Средняя рука',st:'x',op:'add',p:1,max:5,b:9000,k:1.55,d:'берёт охапку',req:'h1'},
+{id:'h3',g:'Руки',n:'Огромная рука',st:'x',op:'add',p:1,max:4,b:150000,k:1.7,d:'хватает целую копну',req:'h2'},
+{id:'s1',g:'Руки',n:'Сила малых рук',st:'x',op:'add',p:1,max:10,b:900,k:1.5,d:'+25% захват, быстрее цикл',req:'h1'},
+{id:'s2',g:'Руки',n:'Сила средних рук',st:'x',op:'add',p:1,max:10,b:14000,k:1.55,d:'+25% захват, быстрее цикл',req:'h2'},
+{id:'s3',g:'Руки',n:'Сила огромных рук',st:'x',op:'add',p:1,max:10,b:220000,k:1.6,d:'+25% захват, быстрее цикл',req:'h3'}];
+let S={cash:0,pts:0,round:0,lv:{},blades:250000,sb:0,sw:0,tt:60,truck:null,ak:{on:true,p:60}},slot=-1,running=false,size=250000;
+const KEY=i=>'needle_slot_'+i;
+let BL=0,BH=W*H-1,BS=0;
+const MODES=[[12000,'Малый · 12 000'],[250000,'Средний · 250 000'],[125000000,'Огромный · 125 млн']];
+const snap=()=>({S,heap:Array.from(heap,v=>+v.toFixed(3)),needle,nstate,junk:[...junk],buf,roundEarned,mxH});
+const save=()=>{if(slot<0||!running)return;try{localStorage.setItem(KEY(slot),JSON.stringify(snap()))}catch(e){}};
+addEventListener('pagehide',save);
+function st(s,base){let a=0,i=0,m=1;for(const n of N){if(n.st!==s)continue;const l=S.lv[n.id]||0;if(!l)continue;if(n.op=='add')a+=n.p*l;else if(n.op=='inc')i+=n.p*l;else m*=Math.pow(n.p,l)}return(base+a)*(1+i)*m}
+const f=v=>{v=+v;if(v<1e3)return v.toFixed(v<10?1:0);const s=['','K','M','B','T'];let i=0;while(v>=1e3&&i<4){v/=1e3;i++}return v.toFixed(1)+s[i]};
+let heap,inside,jit,needle,nstate,junk,mxH,buf={m:0,n:false},tm=0,mx=-1,my=-1,down=false,fx=[],roundEarned=0,last=[0,0,0],banner=0,beepT=0,sig=0,left=0,msgT=0;
+const say=t=>{$('msg').textContent=t;msgT=4};
+function newHeap(){
+  heap=new Float32Array(W*H);inside=new Uint8Array(W*H);jit=[];junk=new Set();
+  let sum=0;
+  for(let cy=0;cy<H;cy++)for(let cx=0;cx<W;cx++){
+    const i=cy*W+cx,dx=(cx+.5-W/2)/(W/2),dy=(cy+.5-H*.95)/(H*.95),v=1-dx*dx-dy*dy;
+    jit[i]=Math.random();
+    if(v>.05){inside[i]=1;heap[i]=(.4+v)*(1+Math.random()*.2);sum+=heap[i]}
+  }
+  const k=S.blades/100*Math.pow(1.5,S.round)/sum;mxH=0;for(let i=0;i<W*H;i++){heap[i]*=k;if(heap[i]>mxH)mxH=heap[i]}
+  const cells=[];for(let i=0;i<W*H;i++)if(heap[i]>0)cells.push(i);
+  needle=cells[(Math.random()*cells.length)|0];nstate='hid';
+  for(let k=0;k<6*S.round;k++)junk.add(cells[(Math.random()*cells.length)|0]);
+  junk.delete(needle);buf={m:0,n:false};roundEarned=0;tm=0;BL=0;BH=W*H-1;BS=0;
+}
+function rehide(){const c=[];for(let i=0;i<W*H;i++)if(heap[i]>0)c.push(i);needle=c[(Math.random()*c.length)|0];nstate='hid';BL=0;BH=W*H-1;BS=0}
+let ac;
+function beep(fr=700,d=.07,v=.05){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=fr;g.gain.value=v;o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);o.stop(ac.currentTime+d)}
+function take(i,amt,C){const g=Math.min(amt,C-buf.m,heap[i]);if(g<=0)return 0;heap[i]-=g;buf.m+=g;
+  if(heap[i]<=1e-6){heap[i]=0;if(i===needle&&nstate==='hid'){nstate='buf';buf.n=true}junk.delete(i)}return g}
+function dump(T){
+  const m=buf.m,Q1=st('qb',8)*T,Q2=S.lv.pap?st('qp',6)*T:0,Q3=S.lv.pel?st('qq',4)*T:0;
+  const m1=Math.min(m,Q1),m2=Math.min(m1,Q2),m3=Math.min(m2,Q3);
+  const mult=st('sel',1)*(1+.1*S.pts);
+  const inc=((m-m1)*.2+(m1-m2)*.8+(m2-m3)*2+m3*4.8)*mult;
+  S.cash+=inc;roundEarned+=inc;last=[m1,m2,m3];S.sb=Math.min(99,(S.sb||0)+(m1-m2)/20);S.sw=Math.min(99,(S.sw||0)+m2/20);
+  if(inc>0)fx.push({t:'+$'+f(inc),x:340,y:440,l:1.2});
+  const hadN=buf.n;buf.m=0;buf.n=false;
+  if(hadN){
+    if(Math.random()<Math.min(1,st('acc',.7)))win();
+    else{say('Сканер пропустил иголку! Она упала обратно в стог.');rehide()}
+  }
+}
+function win(){
+  const rw=Math.max(300*(1+S.round),roundEarned*.15)*(1+.1*S.pts);
+  S.cash+=rw;S.pts+=1+S.round;S.round++;banner=3;
+  say('Иголка найдена! Награда $'+f(rw)+', престиж +'+(S.round)+'. Новый стог плотнее.');
+  [880,660,880,1100].forEach((q,k)=>setTimeout(()=>beep(q,.15,.08),k*160));
+  newHeap();save();
+}
+function digAt(dt,C,px=mx,py=my,rm=1,sm=1){
+  const r=st('rad',1.2)*rm,sp=st('dig',6)*dt*sm,gx=(px-OX)/CS,gy=(py-OY)/CS;
+  for(let cy=Math.max(0,Math.floor(gy-r));cy<=Math.min(H-1,Math.ceil(gy+r));cy++)
+    for(let cx=Math.max(0,Math.floor(gx-r));cx<=Math.min(W-1,Math.ceil(gx+r));cx++)
+      if(Math.hypot(cx+.5-gx,cy+.5-gy)<=r)take(cy*W+cx,sp,C);
+}
+function tick(dt){
+  const C=st('cap',20),T=Math.max(.5,st('cyc',3));
+  if(down)digAt(dt,C);
+  if(S.lv.ak&&S.ak.on&&!down){
+    const E=(.15+.05*(S.lv.akp||0))*S.ak.p/100;AU.w+=dt;let d=Math.hypot(AU.tx-AU.x,AU.ty-AU.y);
+    if(d<6||AU.w>4){AU.w=0;for(let k=0;k<20;k++){const i=(Math.random()*W*H)|0;if(heap[i]>0){AU.tx=OX+(i%W+.5)*CS;AU.ty=OY+((i/W)|0)*CS+CS/2;break}}}
+    d=Math.hypot(AU.tx-AU.x,AU.ty-AU.y);if(d>0){const v=Math.min(d,110*dt);AU.x+=(AU.tx-AU.x)/d*v;AU.y+=(AU.ty-AU.y)/d*v}
+    digAt(dt,C,AU.x,AU.y,.7,E)}
+  handsTick(dt,C);truckTick(dt);
+  const F=st('F',0);
+  if(F>0){let a=F*dt;for(let k=0;a>0&&k<60&&buf.m<C-.01;k++){const i=(Math.random()*W*H)|0;if(heap[i]>0)a-=take(i,Math.min(a,3),C)}}
+  tm+=dt;if(tm>=T){tm=0;dump(T)}
+  // metal detector
+  sig=0;
+  if(S.lv.dU&&mx>=OX&&my>=OY&&my<OY+H*CS){
+    const gx=(mx-OX)/CS,gy=(my-OY)/CS,R=st('det',8);let d=1e9;
+    const chk=i=>{d=Math.min(d,Math.hypot(i%W+.5-gx,((i/W)|0)+.5-gy))};
+    if(nstate==='hid')chk(needle);junk.forEach(chk);
+    if(d<R)sig=1-d/R;
+  }
+  beepT-=dt;if(sig>0&&beepT<=0){beep(700,.06);beepT=.07+(1-sig)*.7}
+  fx.forEach(o=>{o.l-=dt;o.y-=30*dt});fx=fx.filter(o=>o.l>0);
+  if(banner>0)banner-=dt;
+  if(msgT>0&&(msgT-=dt)<=0)$('msg').textContent='';
+  return[C,T];
+}
+function draw(C,T,time){
+  const g=x.createLinearGradient(0,0,0,600);g.addColorStop(0,'#9fd3ee');g.addColorStop(.7,'#d9ecd0');g.addColorStop(1,'#7fa650');
+  x.fillStyle=g;x.fillRect(0,0,700,600);
+  for(let i=0;i<W*H;i++){
+    if(!inside[i])continue;const px=OX+(i%W)*CS,py=OY+((i/W)|0)*CS,h=heap[i];
+    if(h>0){const s=Math.min(1,h/mxH);x.fillStyle=`hsl(${44+jit[i]*8},${60+jit[i]*20}%,${28+s*34+jit[i]*6}%)`}
+    else x.fillStyle='#7a5a2e';
+    x.fillRect(px,py,CS,CS);
+    if(S.lv.bin&&(i<BL||i>BH)){x.fillStyle='rgba(15,20,45,.62)';x.fillRect(px,py,CS,CS)}
+  }
+  if(mx>=0&&my<OY+H*CS){
+    const r=st('rad',1.2)*CS;x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.arc(mx,my,r,0,7);x.stroke();
+    if(sig>0){x.strokeStyle='#ff5252';x.beginPath();x.arc(mx,my,r+4+sig*10,0,7);x.stroke()}
+  }
+  if(S.lv.dU){  x.fillStyle='rgba(0,0,0,.55)';x.fillRect(500,14,186,22);x.fillStyle='#ff5252';x.fillRect(504,26,178*sig,6);
+  x.fillStyle='#fff';x.font='11px system-ui';x.fillText('Металлоискатель',506,23)}
+  // belt
+  x.fillStyle='#3b3b3b';x.fillRect(14,445,672,46);
+  x.fillStyle='#d9b24a';x.fillRect(14,445,672*buf.m/C,46);
+  x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=2;const off=(time*40)%24;
+  for(let k=-24;k<672;k+=24){x.beginPath();x.moveTo(14+k+off,445);x.lineTo(14+k+off,491);x.stroke()}
+  for(let i=0;i<14;i++){x.fillStyle=i<tm/T*14?'#4ade80':'#14301f';x.beginPath();x.arc(40+i*46,468,8,0,7);x.fill()}
+  x.fillStyle='#fff';x.font='bold 12px system-ui';x.fillText(`Лента ${f(buf.m)}/${f(C)} ед · цикл ${T.toFixed(2)} с`,22,458);
+  HS.forEach((h,i)=>{const T=HT[h.t],e=v=>v*v*(3-2*v),ph=h.ph;let r=ph<.4?e(ph/.4):ph<.5?1:ph<.9?1-e((ph-.5)/.4):0;if(h.tx<0)r=0;
+    const bx=40+(i+.5)*620/HS.length,by=443,gx=OX+(h.tx%W+.5)*CS,gy=OY+((h.tx/W)|0)*CS+CS/2,px=bx+(gx-bx)*r,py=by+(gy-by)*r,a=Math.atan2(gy-by,gx-bx);
+    x.lineCap='round';x.strokeStyle=T.c;x.lineWidth=T.w;x.beginPath();x.moveTo(bx,by);x.lineTo(px,py);x.stroke();
+    x.fillStyle='#37474f';x.beginPath();x.arc(bx,by,T.w*.9,0,7);x.fill();
+    x.fillStyle=T.c;x.beginPath();x.arc(px,py,T.hr,0,7);x.fill();
+    for(let k=-1;k<=1;k++){x.beginPath();x.arc(px+Math.cos(a+k*.6)*T.hr*1.05,py+Math.sin(a+k*.6)*T.hr*1.05,T.hr*.35,0,7);x.fill()}
+    if(ph>.5&&ph<.92&&h.got>0){x.fillStyle='#e6c24a';x.beginPath();x.arc(px,py,T.hr*.75,0,7);x.fill()}});
+  x.lineCap='butt';
+  if(S.lv.ak&&S.ak.on){x.strokeStyle='#4fc3f7';x.lineWidth=2;x.setLineDash([4,3]);x.beginPath();x.arc(AU.x,AU.y,st('rad',1.2)*.7*CS,0,7);x.stroke();x.setLineDash([]);x.font='14px system-ui';x.fillStyle='#fff';x.fillText('🤖',AU.x-8,AU.y+5)}
+  // machines
+  const M=[['Пресс (тюки)',1,st('qb',8),last[0]],['Бумага',S.lv.pap,st('qp',6),last[1]],['Пеллеты',S.lv.pel,st('qq',4),last[2]]];
+  M.forEach((m,i)=>{const bx=14+i*228;x.fillStyle=m[1]?'#2f4a3a':'#444';x.fillRect(bx,505,216,85);
+    x.fillStyle='#fff';x.font='bold 14px system-ui';x.fillText(m[0],bx+10,528);x.font='12px system-ui';
+    x.fillText(m[1]?`Мощность ${f(m[2])} ед/с`:'Закрыто — купите улучшение',bx+10,548);
+    if(m[1])x.fillText(`Последняя партия: ${f(m[3])} ед`,bx+10,566)});
+  fx.forEach(o=>{x.globalAlpha=Math.min(1,o.l);x.fillStyle='#fff7a8';x.font='bold 16px system-ui';x.fillText(o.t,o.x,o.y);x.globalAlpha=1});
+  if(banner>0){x.fillStyle='rgba(0,0,0,.6)';x.fillRect(0,230,700,90);x.fillStyle='#ffd54a';x.font='bold 36px system-ui';x.textAlign='center';x.fillText('ИГОЛКА НАЙДЕНА!',350,288);x.textAlign='left'}
+}
+// hands
+const HT=[{id:'h1',s:'s1',cyc:1.3,amt:4,r:1,w:5,hr:5,c:'#e8b894'},{id:'h2',s:'s2',cyc:1.5,amt:24,r:1.7,w:9,hr:8,c:'#dca67e'},{id:'h3',s:'s3',cyc:2,amt:150,r:3,w:16,hr:13,c:'#c98f66'}];
+let HS=[],hk='',AU={x:350,y:200,tx:350,ty:200,w:0};
+function pickT(h){h.tx=-1;for(let k=0;k<30;k++){const i=(Math.random()*W*H)|0;if(heap[i]>0){h.tx=i;break}}}
+function syncHands(){const n=HT.map(T=>S.lv[T.id]||0),key=n.join();if(key===hk)return;hk=key;HS=[];n.forEach((c,t)=>{for(let i=0;i<c;i++)HS.push({t,ph:Math.random(),tx:-1,got:0})});HS.forEach(pickT)}
+function handsTick(dt,C){HS.forEach(h=>{const T=HT[h.t],p=S.lv[T.s]||0,o=h.ph;h.ph+=dt/(T.cyc/(1+.05*p));
+  if(h.ph>=1){h.ph-=1;pickT(h);h.got=0}
+  if(o<.5&&h.ph>=.5&&h.tx>=0){let rem=T.amt*(1+.25*p);const cx=h.tx%W,cy=(h.tx/W)|0;h.got=0;
+    for(let yy=cy-3;yy<=cy+3&&rem>0;yy++)for(let xx=cx-3;xx<=cx+3&&rem>0;xx++){if(xx<0||yy<0||xx>=W||yy>=H)continue;if(Math.hypot(xx-cx,yy-cy)<=T.r){const g=take(yy*W+xx,rem,C);rem-=g;h.got+=g}}}})}
+// truck
+const REST=40,BEDW=186,OYT=30,TL=[{k:'b',s:'sb',x:566,n:'Тюки'},{k:'w',s:'sw',x:634,n:'Обмот.'}],tq=$('tc').getContext('2d');
+let tstate='none',trx=-300,smoke=[],drag=null,smT=0,wang=0,tv=0;
+function resetTruck(){tstate=S.truck?'wait':'none';trx=S.truck?REST:-300;smoke=[];drag=null;tv=0}
+function mkOrder(){const r=n=>(Math.random()*(n+1))|0,nb=Math.min(12,3+S.round*2+r(2)),nw=S.lv.pap?Math.min(6,1+S.round+r(1)):0;
+  return{nb,nw,lb:0,lw:0,rw:Math.round((nb*60+nw*200)*(1+S.round*.5)*(1+.1*S.pts)*st('sel',1))}}
+function truckTick(dt){
+  wang+=tv*dt/11;
+  if(tstate==='none'){tv=0;if(!S.truck){S.tt-=dt;if(S.tt<=0){S.truck=mkOrder();tstate='arrive';trx=-280}}}
+  else if(tstate==='arrive'){tv=Math.max(30,(REST-trx)*1.5);trx+=tv*dt;if(trx>=REST-.5){trx=REST;tstate='wait';tv=0}}
+  else if(tstate==='leave'){tv+=140*dt;trx+=tv*dt;if(trx>720){tstate='none';S.truck=null;S.tt=90+Math.random()*60;tv=0}}
+  if(tstate!=='none'){smT-=dt;if(smT<=0){smT=tstate==='wait'?.16:.09;smoke.push({x:trx+BEDW+3,y:OYT+6,vx:-8-Math.random()*6-tv*.15,vy:-12-Math.random()*8,r:3,l:0,L:2.6+Math.random()})}}
+  smoke.forEach(p=>{p.l+=dt;p.x+=p.vx*dt+Math.sin(p.l*3+p.y)*6*dt;p.y+=p.vy*dt;p.r+=dt*4});smoke=smoke.filter(p=>p.l<p.L)}
+function bale(a,b,w){tq.fillStyle=w?'#e3edf2':'#d9b24a';tq.fillRect(a,b,27,17);tq.strokeStyle=w?'#3f86c9':'#a47a1c';tq.lineWidth=2;tq.beginPath();
+  if(w){tq.rect(a+1,b+1,25,15);tq.moveTo(a+1,b+1);tq.lineTo(a+26,b+16);tq.moveTo(a+1,b+16);tq.lineTo(a+26,b+1)}else{tq.moveTo(a+9,b);tq.lineTo(a+9,b+17);tq.moveTo(a+18,b);tq.lineTo(a+18,b+17)}tq.stroke()}
+function wheel(cx,cy){tq.fillStyle='#1c1c1c';tq.beginPath();tq.arc(cx,cy,11,0,7);tq.fill();tq.fillStyle='#9e9e9e';tq.beginPath();tq.arc(cx,cy,4.5,0,7);tq.fill();
+  tq.strokeStyle='#777';tq.lineWidth=2;tq.beginPath();for(let k=0;k<3;k++){const a=wang+k*2.094;tq.moveTo(cx,cy);tq.lineTo(cx+Math.cos(a)*9,cy+Math.sin(a)*9)}tq.stroke()}
+function drawTruck(t){
+  const g=tq.createLinearGradient(0,0,0,180);g.addColorStop(0,'#bfe3f5');g.addColorStop(1,'#e6f0d8');tq.fillStyle=g;tq.fillRect(0,0,700,180);
+  tq.fillStyle='#555';tq.fillRect(0,158,700,22);tq.fillStyle='#ddd';for(let k=0;k<700;k+=50)tq.fillRect(k+8,168,26,3);
+  const o=S.truck;
+  if(tstate!=='none'&&o){
+    const bob=Math.sin(t*(tstate==='wait'?18:30))*(tstate==='wait'?.5:1.2);
+    tq.save();tq.translate(trx,OYT+bob);
+    tq.fillStyle='#5a4630';tq.fillRect(0,40,BEDW,60);
+    let k=0;const put=(n,w)=>{for(let i=0;i<n;i++,k++)bale(6+(k%6)*29,100-((k/6|0)+1)*19,w)};put(o.lb,0);put(o.lw,1);
+    tq.strokeStyle='#3a2c1a';tq.lineWidth=3;tq.strokeRect(1.5,40,BEDW-3,60);
+    tq.fillStyle='#222';tq.fillRect(BEDW,8,7,92);
+    tq.fillStyle='#c0392b';tq.fillRect(BEDW+7,56,58,44);tq.fillStyle='#a93226';tq.fillRect(BEDW+7,48,42,8);
+    tq.fillStyle='#bfe9ff';tq.fillRect(BEDW+30,60,28,18);tq.fillStyle='#ffd54a';tq.fillRect(BEDW+60,86,5,6);
+    tq.fillStyle='#2b2b2b';tq.fillRect(-4,100,BEDW+72,8);
+    [34,90,BEDW+36].forEach(cx=>wheel(cx,118));
+    tq.restore();
+  }
+  smoke.forEach(p=>{tq.globalAlpha=.32*(1-p.l/p.L);tq.fillStyle='#8a8a8a';tq.beginPath();tq.arc(p.x,p.y,p.r,0,7);tq.fill()});tq.globalAlpha=1;
+  tq.fillStyle='#2b2616';tq.font='bold 13px system-ui';
+  if(o&&tstate==='wait'){tq.fillText('Грузовик ждёт погрузки',310,34);tq.font='13px system-ui';
+    tq.fillText('Тюки '+o.lb+'/'+o.nb+(o.nw?' · Обмотанные '+o.lw+'/'+o.nw:''),310,54);tq.fillText('Награда $'+f(o.rw),310,72);
+    tq.globalAlpha=.65;tq.font='11px system-ui';tq.fillText('Перетащи тюки со склада → в кузов',310,92);tq.globalAlpha=1}
+  else if(!o){tq.globalAlpha=.55;tq.font='12px system-ui';tq.fillText('Следующий грузовик через ~'+Math.ceil(S.tt)+' с',310,34);tq.globalAlpha=1}
+  TL.forEach(T=>{const n=Math.floor(S[T.s]||0),lock=T.k==='w'&&!S.lv.pap;tq.globalAlpha=lock?.4:1;tq.fillStyle='rgba(255,255,255,.6)';tq.fillRect(T.x,8,60,76);
+    bale(T.x+16,16,T.k==='w');tq.fillStyle='#2b2616';tq.font='12px system-ui';tq.fillText(T.n,T.x+6,50);tq.font='bold 14px system-ui';tq.fillText(lock?'🔒':'×'+n,T.x+6,70);tq.globalAlpha=1});
+  if(drag){if(tstate==='wait'){tq.strokeStyle='#2e7d32';tq.setLineDash([6,4]);tq.lineWidth=2;tq.strokeRect(trx,OYT+40,BEDW,60);tq.setLineDash([])}bale(drag.x-13,drag.y-8,drag.k==='w')}
+}
+function tp(e){const r=$('tc').getBoundingClientRect();return[(e.clientX-r.left)*700/r.width,(e.clientY-r.top)*180/r.height]}
+$('tc').addEventListener('pointerdown',e=>{const[px,py]=tp(e);for(const T of TL)if(px>=T.x&&px<=T.x+60&&py>=8&&py<=84&&Math.floor(S[T.s]||0)>=1){drag={k:T.k,x:px,y:py};try{$('tc').setPointerCapture(e.pointerId)}catch(_){}}});
+$('tc').addEventListener('pointermove',e=>{if(drag){const p=tp(e);drag.x=p[0];drag.y=p[1]}});
+$('tc').addEventListener('pointercancel',()=>{drag=null});
+$('tc').addEventListener('pointerup',()=>{if(!drag)return;const o=S.truck,d=drag;drag=null;
+  if(!o||tstate!=='wait'||d.x<trx-10||d.x>trx+BEDW+70||d.y<OYT||d.y>OYT+120)return;
+  const kk=d.k==='b'?'lb':'lw',nd=d.k==='b'?'nb':'nw',sk=d.k==='b'?'sb':'sw';
+  if(o[kk]>=o[nd]){say('Такого груза в заказе больше не нужно.');return}
+  o[kk]++;S[sk]-=1;beep(520,.05,.04);
+  if(o.lb>=o.nb&&o.lw>=o.nw){S.cash+=o.rw;fx.push({t:'+$'+f(o.rw),x:300,y:440,l:1.8});say('Заказ выполнен! +$'+f(o.rw));tstate='leave';tv=40;save()}});
+// binary search probe
+function probe(){
+  if(!S.lv.bin||!running)return;
+  if(nstate!=='hid'){say('Иголка уже на ленте — дождись цикла.');return}
+  if(BL>=BH){say('Осталась одна клетка — копай здесь!');return}
+  const c=Math.round(30*(1+S.round)*st('bpc',1));
+  if(S.cash<c){say('Не хватает $'+f(c)+' на запрос.');return}
+  S.cash-=c;BS++;const m=(BL+BH)>>1,yes=needle<=m;
+  if(yes)BH=m;else BL=m+1;
+  say(`Шаг ${BS}: номер клетки ≤ ${m}? ${yes?'Да':'Нет'}. Осталось ${BH-BL+1} клеток.`);beep(yes?760:520,.05,.04);refresh()}
+$('bpb').onclick=probe;
+$('bpr').onclick=()=>{BL=0;BH=W*H-1;BS=0;refresh()};
+// informatics quiz
+const QB=[
+['Сколько бит в одном байте?','8',['4','16','10']],
+['1 килобайт = … байт (в двоичной системе)','1024',['1000','100','512']],
+['Какой алгоритм ищет в отсортированном списке, деля его пополам?','Бинарный поиск',['Линейный поиск','Пузырьковая сортировка','Хеширование']],
+['Сколько значений можно закодировать 3 битами?','8',['3','6','9']],
+['Сколько проверок в худшем случае у линейного поиска среди n элементов?','n',['log₂ n','1','n²']],
+['Что такое алгоритм?','Чёткая последовательность шагов для решения задачи',['Язык программирования','Вид компьютерного вируса','Часть монитора']],
+['Какая память стирается при выключении питания?','ОЗУ (RAM)',['SSD','Жёсткий диск','Флешка']],
+['Чему равно 1 + 1 в двоичной системе?','10',['2','11','1']],
+['Что хранит переменная в программе?','Значение, которое можно менять',['Только текст','Название файла','Адрес сайта']]];
+function mkQ(){
+  const r=Math.random(),n=5+((Math.random()*27)|0);
+  if(r<.25)return[`Переведи ${n.toString(2)}₂ в десятичную систему`,''+n,[n+1,n-1,n+2].map(String)];
+  if(r<.5)return[`Переведи ${n} в двоичную систему`,n.toString(2),[n^1,n^2,n^4].map(v=>v.toString(2))];
+  if(r<.65){const k=3+((Math.random()*8)|0);return[`Сколько раз нужно разделить пополам диапазон из ${1<<k} элементов, чтобы остался один?`,''+k,[k+1,k-1,k+2].map(String)]}
+  return QB[(Math.random()*QB.length)|0]}
+let QC=null,qk=0,qcd=0;
+function askQ(){
+  if(QC!==null)return;
+  if(Date.now()<qcd){$('qs').textContent='Следующая задача через '+Math.ceil((qcd-Date.now())/1000)+' с';return}
+  const[t,a,w]=mkQ();QC=a;$('qt').textContent=t;$('qs').textContent='';const o=$('qo');o.innerHTML='';
+  [a,...w].sort(()=>Math.random()-.5).forEach(v=>{const b=document.createElement('button');b.className='sb';b.textContent=v;b.onclick=()=>ansQ(v);o.appendChild(b)})}
+function ansQ(v){
+  if(QC===null)return;const ok=v===QC,rw=Math.round(150*(1+S.round)*(1+.1*S.pts)*(1+.2*Math.min(qk,5)));
+  if(ok){qk++;S.cash+=rw;say('Верно! +$'+f(rw)+' · серия '+qk);beep(880,.1,.06)}else{qk=0;say('Неверно. Правильный ответ: '+QC);beep(200,.2,.06)}
+  QC=null;$('qt').textContent='';$('qo').innerHTML='';qcd=Date.now()+8000;$('qs').textContent=ok?'Серия: '+qk:'';refresh()}
+$('qn').onclick=askQ;
+// autoclicker UI
+$('acb').onclick=()=>{S.ak.on=!S.ak.on;refresh()};
+$('acr').oninput=()=>{S.ak.p=+$('acr').value;refresh()};
+// save code generator
+MODES.forEach(m=>{const o=document.createElement('option');o.value=m[0];o.textContent=m[1];if(m[0]===250000)o.selected=true;$('gs').appendChild(o)});
+$('gen').onclick=()=>{
+  const num=id=>Math.max(0,Math.floor(+$(id).value)||0),la=num('gl'),keep=[S,heap,inside,jit,needle,nstate,junk,mxH,buf,roundEarned],lv={};
+  N.forEach(n=>{const l=Math.min(n.max,la);if(l)lv[n.id]=l});
+  S=Object.assign({cash:0,pts:0,round:0,lv:{},blades:250000,sb:0,sw:0,tt:60,truck:null,ak:{on:true,p:60}},{cash:num('gc'),pts:num('gp'),round:Math.min(30,num('gr')),lv,blades:+$('gs').value});
+  newHeap();const c=btoa(JSON.stringify(snap()));
+  [S,heap,inside,jit,needle,nstate,junk,mxH,buf,roundEarned]=keep;
+  $('code').value=c;$('mm').textContent='Код создан. Нажмите «Импорт кода», чтобы загрузить его в текущий слот.'};
+// UI
+const ups=$('ups'),btn={};
+[...new Set(N.map(n=>n.g))].forEach(gn=>{
+  const h=document.createElement('h3');h.textContent=gn;ups.appendChild(h);
+  const d=document.createElement('div');d.className='grp';ups.appendChild(d);
+  N.filter(n=>n.g===gn).forEach(n=>{const b=document.createElement('button');b.className='up';b.dataset.id=n.id;d.appendChild(b);btn[n.id]=b});
+});
+function buy(id){const n=N.find(q=>q.id===id),l=S.lv[id]||0,c=n.b*Math.pow(n.k,l);
+  if(l<n.max&&S.cash>=c&&(!n.req||S.lv[n.req])){S.cash-=c;S.lv[id]=l+1;refresh()}}
+ups.addEventListener('click',e=>{const b=e.target.closest('button');if(b)buy(b.dataset.id)});
+function refresh(){
+  syncHands();
+  $('cash').textContent='$'+f(S.cash);
+  $('info').textContent=`${f(S.blades)} травинок · Раунд ${S.round+1} · Престиж ${S.pts} (×${(1+.1*S.pts).toFixed(1)}) · сена в стоге ${f(left)}`;
+  N.forEach(n=>{const b=btn[n.id],l=S.lv[n.id]||0,c=n.b*Math.pow(n.k,l),lock=n.req&&!S.lv[n.req];
+    b.innerHTML=`<b>${n.n}</b> ${l}/${n.max}<small>${lock?'Нужно: '+N.find(q=>q.id===n.req).n:n.d}</small><small>${l>=n.max?'Макс.':'$'+f(c)}</small>`;
+    b.disabled=lock||l>=n.max||S.cash<c});
+  $('acp').style.display=S.lv.ak?'':'none';
+  $('bsp').style.display=S.lv.bin?'flex':'none';
+  if(S.lv.bin){const c=Math.round(30*(1+S.round)*st('bpc',1)),n=BH-BL+1;$('bpb').textContent='Запрос −$'+f(c);$('bpb').disabled=S.cash<c||nstate!=='hid'||n<2;
+    $('bpv').textContent=`диапазон ${BL}…${BH} · клеток ${n} · шагов ${BS} · осталось ≤ ${Math.ceil(Math.log2(n))} (линейный поиск: до ${n})`}
+  if(S.lv.ak){$('acb').textContent=S.ak.on?'Вкл':'Выкл';$('acb').classList.toggle('on',S.ak.on);if(document.activeElement!==$('acr'))$('acr').value=S.ak.p;
+    $('acv').textContent=S.ak.p+'% · '+Math.round((.15+.05*(S.lv.akp||0))*S.ak.p)+'% силы ручного копания'}
+}
+// input
+function pos(e){const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)*cv.width/r.width;my=(e.clientY-r.top)*cv.height/r.height}
+cv.addEventListener('pointerdown',e=>{if(!ac)try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}down=true;pos(e);try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+cv.addEventListener('pointermove',pos);
+['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{down=false}));
+cv.addEventListener('pointerleave',()=>{if(!down){mx=-1;my=-1}});
+function ask(b,fn){if(b.dataset.s){fn();return}const t=b.textContent;b.dataset.s=1;b.textContent='Точно?';setTimeout(()=>{delete b.dataset.s;b.textContent=t},3000)}
+function peek(i){try{const r=localStorage.getItem(KEY(i));return r?JSON.parse(r):null}catch(e){return null}}
+function begin(){running=true;$('menu').style.display='none';refresh()}
+function load(d){S=Object.assign({cash:0,pts:0,round:0,lv:{},blades:250000,sb:0,sw:0,tt:60,truck:null,ak:{on:true,p:60}},d.S);if(S.lv.det&&!S.lv.dU)S.lv.dU=1;resetTruck();newHeap();
+  if(d.heap&&d.heap.length==W*H){heap=Float32Array.from(d.heap);needle=d.needle;nstate=d.nstate;junk=new Set(d.junk);buf=d.buf;roundEarned=d.roundEarned||0;mxH=d.mxH||mxH}}
+function newGame(i){S=Object.assign({cash:0,pts:0,round:0,lv:{},blades:250000,sb:0,sw:0,tt:60,truck:null,ak:{on:true,p:60}},{blades:size});resetTruck();newHeap();slot=i;running=true;save();begin()}
+function openMenu(){save();running=false;renderMenu();$('menu').style.display='flex'}
+function renderMenu(){
+  const sl=$('slots');sl.innerHTML='';
+  for(let i=0;i<3;i++){const d=peek(i),c=document.createElement('div');c.className='slot';
+    const m=d&&MODES.find(q=>q[0]===d.S.blades);
+    c.innerHTML=`<div><b>Слот ${i+1}${i===slot?' ●':''}</b><small>${d?`${m?m[1]:d.S.blades} · раунд ${d.S.round+1} · престиж ${d.S.pts} · $${f(d.S.cash)}`:'пусто'}</small></div>`;
+    const bx=document.createElement('div');
+    const add=(t,fn)=>{const b=document.createElement('button');b.className='sb';b.textContent=t;b.onclick=()=>fn(b);bx.appendChild(b);bx.appendChild(document.createTextNode(' '))};
+    if(d){add('Играть',()=>{load(d);slot=i;begin()});add('Удалить',b=>ask(b,()=>{try{localStorage.removeItem(KEY(i))}catch(e){}if(slot===i)slot=-1;renderMenu()}))}
+    add(d?'Новая (перезапись)':'Новая игра',b=>d?ask(b,()=>newGame(i)):newGame(i));
+    c.appendChild(bx);sl.appendChild(c)}
+  const sz=$('sizes');sz.innerHTML='';
+  MODES.forEach(m=>{const b=document.createElement('button');b.className='sb'+(size===m[0]?' on':'');b.textContent=m[1];b.onclick=()=>{size=m[0];renderMenu()};sz.appendChild(b)});
+  $('resume').style.display=slot>=0?'':'none'}
+$('mbtn').onclick=openMenu;
+$('sbtn').onclick=()=>{save();say(slot>=0?'Сохранено в слот '+(slot+1):'Нет активного слота')};
+$('resume').onclick=begin;
+$('exp').onclick=()=>{$('code').value=btoa(JSON.stringify(snap()));$('mm').textContent='Скопируйте код и сохраните его в надёжном месте.'};
+$('imp').onclick=()=>{try{const d=JSON.parse(atob($('code').value.trim()));if(!d.S||!d.heap)throw 0;const i=slot<0?0:slot;load(d);slot=i;running=true;save();begin()}catch(e){$('mm').textContent='Неверный код сохранения.'}};
+// loop
+newHeap();refresh();renderMenu();
+let prev=performance.now(),ui=0,sv=0;
+function loop(t){
+  const dt=Math.min(.05,(t-prev)/1000);prev=t;
+  const[C,T]=running?tick(dt):[st('cap',20),Math.max(.5,st('cyc',3))];draw(C,T,t/1000);drawTruck(t/1000);
+  ui+=dt;if(ui>.25){ui=0;left=0;for(let i=0;i<W*H;i++)left+=heap[i];refresh()}
+  sv+=dt;if(sv>3){sv=0;save()}
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script></body></html>
