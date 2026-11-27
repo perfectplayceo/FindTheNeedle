@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Найди иголку</title>
@@ -29,17 +28,65 @@ button.up b{color:var(--ac)}
 .sizes{display:flex;flex-wrap:wrap;gap:6px}
 textarea{width:100%;box-sizing:border-box;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:6px;margin-bottom:6px}
 .gen label{display:block;margin:4px 0}.gen input,.gen select{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:6px;padding:4px;font:inherit;width:140px}#acp{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}#tc{margin-top:6px;cursor:default}
+#app{padding-bottom:80px}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.sb,button.up,#upgo,#qn{user-select:none;-webkit-user-select:none}
+.sb:active,button.up:active{transform:scale(.97)}
+#guide{display:none;gap:10px;align-items:center;background:var(--ac);color:#1c1a14;padding:10px 12px;border-radius:12px;font-weight:700;margin:6px 0;font-size:16px}
+.ar{font-size:30px;animation:bob .9s ease-in-out infinite}
+#guide button{background:#1c1a14;color:#fff;border:0;border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer}
+@keyframes bob{50%{transform:translateY(7px)}}
+@keyframes pl{0%,100%{box-shadow:0 0 0 0 rgba(224,165,33,.85)}50%{box-shadow:0 0 0 14px rgba(224,165,33,0)}}
+#qz{border:3px solid var(--ac);border-radius:12px;padding:10px;background:var(--card);margin:6px 0}
+#qz h3{margin:0 0 6px;font-size:16px;text-transform:none;opacity:1}
+#qt{font-size:20px;font-weight:700;margin:6px 0}
+#qo .sb{font-size:20px;padding:14px 16px;flex:1 1 40%}
+#qo .idk{flex:1 1 100%;font-size:16px;border:2px dashed #c0392b;color:#c0392b}
+#qn{font-size:17px;padding:12px 14px;width:100%;font-weight:700;margin-top:6px}
+#qn.big{background:var(--ac);color:#1c1a14;border:0;font-size:22px;padding:18px 14px;animation:pl 1.2s infinite}
+#chgw{position:relative;background:var(--bd);border-radius:8px;height:22px;overflow:hidden}
+#chgb{background:var(--ac);height:100%;width:0;transition:width .3s}
+#chgt{position:absolute;inset:0;text-align:center;line-height:22px;font-weight:700;font-size:13px}
+#cw{position:relative;max-width:700px}
+#lock{display:none;position:absolute;inset:0;background:rgba(10,10,10,.74);color:#fff;border-radius:8px;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;gap:8px;cursor:pointer;font-size:22px;font-weight:700}
+#lock .ar{font-size:46px}
+#dh{display:none;position:absolute;left:50%;top:40%;margin-left:-110px;width:220px;justify-content:center;background:var(--ac);color:#1c1a14;padding:10px 0;border-radius:30px;font-weight:700;font-size:18px;pointer-events:none;animation:bob .9s infinite}
+.cap{font-size:13px;opacity:.8;margin:4px 0 8px}
+#qb{font-size:14px;margin:4px 0}
+#qpop{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--card);border-top:4px solid var(--ac);padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 24px rgba(0,0,0,.35);max-height:75vh;overflow:auto}
+#qtop{display:flex;justify-content:space-between;margin-bottom:6px}
+#qbar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden}#qbb{height:100%;width:100%;background:var(--ac)}
+#qo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#qo .sb{font-size:17px;padding:12px}
+#qo .idk{grid-column:1/-1;font-size:15px}
+#upt{margin:14px 0 4px;padding:10px;border-radius:10px;background:var(--card);border:2px dashed var(--ac);font-weight:700}
+#upgo{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--ac);color:#1c1a14;border:0;border-radius:30px;padding:12px 20px;font:700 16px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+#upgo.pulse{animation:pl 1.2s infinite}
+#how{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin:8px 0}
+#how summary{cursor:pointer;font-weight:700}#how li{margin:5px 0}
 </style></head><body><div id="app">
-<div id="hud"><span id="cash">$0</span><span id="info"></span><button class="sb" id="mbtn">☰ Меню</button><button class="sb" id="sbtn">Сохранить</button></div>
-<canvas id="c" width="700" height="600"></canvas>
+<div id="hud"><span id="cash">$0.0</span><span id="info">250.0K травинок · Раунд 1 · Престиж 0 (×1.0) · сена в стоге 2.5K</span><button class="sb" id="mbtn">☰ Меню</button><button class="sb" id="sbtn">Сохранить</button><button class="sb" id="hbtn">❓ Помощь</button><button class="sb" id="mubtn" title="Звук">🔊</button></div>
+<div id="qb">🎓 Следующий вопрос по информатике через <b id="qcd">5:00</b> · верных: <b id="qok">0</b> · двоек: <b id="qdv">0</b> <button class="sb" id="qnow">Вопрос сейчас</button></div>
+<div id="guide" style="display: none;"><span class="ar" id="ga">⬇</span><span id="gt" style="flex:1">Шаг 1. Зажми палец (или мышь) на стоге и води по нему: так ты копаешь сено.</span><button id="gk" style="display: none;">Понятно</button><button id="gx" title="Скрыть гайд">✕</button></div>
+<div id="cw"><canvas id="c" width="700" height="600"></canvas><div id="dh" style="display: none;">👆 Зажми здесь и води</div></div>
+<div class="cap">⛏ Это стог. Зажми и води по нему, чтобы копать.</div>
 <div id="msg"></div>
 <canvas id="tc" width="700" height="180"></canvas>
+<div class="cap">🚚 Склад тюков и грузовик: когда приедет грузовик, перетащи тюки со склада в кузов.</div>
 <div id="acp" style="display:none">🤖 Автокликер <button class="sb" id="acb">Вкл</button> мощность <input type="range" id="acr" min="10" max="100" step="5"> <span id="acv"></span></div>
 <div id="bsp" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0">🔎 Бинарный поиск <button class="sb" id="bpb">Запрос</button> <button class="sb" id="bpr">Сброс</button> <span id="bpv"></span></div>
-<div id="qz"><h3>🎓 Задача по информатике</h3><div id="qt" style="font-weight:600;margin:4px 0"></div><div id="qo" class="sizes"></div><button class="sb" id="qn" style="margin-top:6px">Получить задачу</button> <span id="qs"></span></div>
-<div id="hint">Зажми мышь или палец на стоге — копаешь, сено летит на ленту. Каждые T секунд лента сбрасывает партию в переработку. Металлоискатель (купи за $10K) пищит у иголки и у мусора. Тюки с пресса копятся на складе справа под стогом — когда приедет грузовик, перетащи их в кузов. Автокликер и руки открываются в улучшениях. Нашёл иголку — престиж и стог плотнее. Информатика: купи «Бинарный поиск» — каждый запрос делит диапазон клеток пополам (как в алгоритме бинарного поиска), а задачи по информатике дают бонус.</div>
-<div id="ups"></div>
-<div id="menu"><div class="box"><h2>🪡 Найди иголку</h2><h3>Слоты сохранения</h3><div id="slots"></div><h3>Размер стога (для новой игры)</h3><div class="sizes" id="sizes"></div><h3>Резервная копия</h3><textarea id="code" rows="3" placeholder="Код сохранения"></textarea><button class="sb" id="exp">Экспорт текущей игры</button> <button class="sb" id="imp">Импорт кода</button><h3>Генератор кода сохранения</h3><div class="gen"><label>Деньги <input id="gc" type="number" value="0" min="0"></label><label>Престиж <input id="gp" type="number" value="0" min="0"></label><label>Раунд (0–30) <input id="gr" type="number" value="0" min="0" max="30"></label><label>Уровень всех улучшений <input id="gl" type="number" value="0" min="0"></label><label>Стог <select id="gs"></select></label></div><button class="sb" id="gen">Сгенерировать код</button><div id="mm" style="min-height:22px;margin:8px 0"></div><button class="sb" id="resume" style="display:none">▶ Продолжить игру</button></div></div>
+<details id="how"><summary>❓ Что здесь что (нажми, чтобы прочитать)</summary><ul>
+<li>🌾 <b>Стог</b> — большое поле сверху. Зажми палец или мышь и води по нему: копаешь сено.</li>
+<li>🎓 <b>Вопрос по информатике</b> — появляется каждые 5 минут, игра не останавливается. Верный ответ даёт деньги. Неверный ответ, «Не знаю» или вышедшее время дают двойку, и в стоге прибавляется 20% сена.</li>
+<li>🧵 <b>Лента</b> — сено едет по ней в переработку, и раз в несколько секунд партия превращается в деньги ($).</li>
+<li>🚚 <b>Склад и грузовик</b> — тюки копятся на складе, а когда приедет грузовик, перетащи их в кузов за деньги.</li>
+<li>🛒 <b>Улучшения</b> — внизу страницы. Серая кнопка значит, что денег пока не хватает. Кнопка «⬇ Улучшения» внизу экрана быстро приведёт туда.</li>
+<li>🪡 <b>Иголка</b> — спрятана в стоге. Найдёшь: получишь престиж (множитель дохода) и новый, более плотный стог.</li>
+<li>🔍 <b>Металлоискатель и бинарный поиск</b> — помогают найти иголку: первый пищит рядом с ней, второй делит область поиска пополам.</li></ul></details>
+<div id="qpop" style="display:none"><div style="max-width:700px;margin:0 auto"><div id="qtop"><b>🎓 Вопрос по информатике</b><span id="qtm"></span></div><div id="qbar"><div id="qbb"></div></div><div id="qt"></div><div id="qo"></div></div></div>
+<div id="upt">🛒 УЛУЧШЕНИЯ: покупай их за деньги, и копать станет быстрее. Серая кнопка значит, что денег пока не хватает.</div>
+<div id="ups"><h3>Конвейер</h3><div class="grp"><button class="up" data-id="cyc" disabled=""><b>Быстрый привод</b> 0/10<small>время цикла ×0.836</small><small>$40</small></button><button class="up" data-id="cap" disabled=""><b>Вместимость ленты</b> 0/25<small>+10 ед.</small><small>$30</small></button></div><h3>Копание</h3><div class="grp"><button class="up" data-id="rad" disabled=""><b>Радиус лопаты</b> 0/10<small>+0.5 клетки</small><small>$50</small></button><button class="up" data-id="dig" disabled=""><b>Скорость копания</b> 0/15<small>+25%</small><small>$60</small></button></div><h3>Сканеры</h3><div class="grp"><button class="up" data-id="dU" disabled=""><b>Металлоискатель (покупка)</b> 0/1<small>открывает металлоискатель</small><small>$10.0K</small></button><button class="up" data-id="det" disabled=""><b>Дальность металлоискателя</b> 0/8<small>Нужно: Металлоискатель (покупка)</small><small>$70</small></button><button class="up" data-id="acc" disabled=""><b>Рентген-сканер</b> 0/6<small>+5% точности</small><small>$150</small></button></div><h3>Алгоритмы</h3><div class="grp"><button class="up" data-id="bin" disabled=""><b>Бинарный поиск (покупка)</b> 0/1<small>зонд делит область поиска пополам: ≤ 11 шагов вместо 1440</small><small>$1.5K</small></button><button class="up" data-id="bpc" disabled=""><b>Оптимизация запросов</b> 0/5<small>Нужно: Бинарный поиск (покупка)</small><small>$800</small></button></div><h3>Автоматизация</h3><div class="grp"><button class="up" data-id="vac" disabled=""><b>Вакуумные трубы</b> 0/15<small>+4 ед/с</small><small>$200</small></button><button class="up" data-id="drn" disabled=""><b>Рой дронов</b> 0/15<small>Нужно: Вакуумные трубы</small><small>$900</small></button><button class="up" data-id="exc" disabled=""><b>Экскаватор</b> 0/10<small>Нужно: Рой дронов</small><small>$5.0K</small></button></div><h3>Переработка</h3><div class="grp"><button class="up" data-id="pap" disabled=""><b>Бумажная фабрика</b> 0/1<small>открывает бумагу</small><small>$400</small></button><button class="up" data-id="pel" disabled=""><b>Завод пеллет</b> 0/1<small>Нужно: Бумажная фабрика</small><small>$4.0K</small></button><button class="up" data-id="qb" disabled=""><b>Мощность пресса</b> 0/20<small>+5 ед/с</small><small>$60</small></button><button class="up" data-id="qp" disabled=""><b>Мощность бумаги</b> 0/20<small>Нужно: Бумажная фабрика</small><small>$500</small></button><button class="up" data-id="qq" disabled=""><b>Мощность пеллет</b> 0/20<small>Нужно: Завод пеллет</small><small>$5.0K</small></button></div><h3>Экономика</h3><div class="grp"><button class="up" data-id="sel" disabled=""><b>Цена продажи</b> 0/20<small>+15%</small><small>$100</small></button></div><h3>Автокликер</h3><div class="grp"><button class="up" data-id="ak" disabled=""><b>Автокликер</b> 0/1<small>копает сам; мощность настраивается ползунком</small><small>$10.0K</small></button><button class="up" data-id="akp" disabled=""><b>Потолок мощности</b> 0/10<small>Нужно: Автокликер</small><small>$15.0K</small></button></div><h3>Руки</h3><div class="grp"><button class="up" data-id="h1" disabled=""><b>Малая рука</b> 0/6<small>берёт горсть сена и кладёт на ленту</small><small>$600</small></button><button class="up" data-id="h2" disabled=""><b>Средняя рука</b> 0/5<small>Нужно: Малая рука</small><small>$9.0K</small></button><button class="up" data-id="h3" disabled=""><b>Огромная рука</b> 0/4<small>Нужно: Средняя рука</small><small>$150.0K</small></button><button class="up" data-id="s1" disabled=""><b>Сила малых рук</b> 0/10<small>Нужно: Малая рука</small><small>$900</small></button><button class="up" data-id="s2" disabled=""><b>Сила средних рук</b> 0/10<small>Нужно: Средняя рука</small><small>$14.0K</small></button><button class="up" data-id="s3" disabled=""><b>Сила огромных рук</b> 0/10<small>Нужно: Огромная рука</small><small>$220.0K</small></button></div></div><button id="upgo" style="display: none;">⬇ Улучшения</button>
+<div id="menu"><div class="box"><h2>🪡 Найди иголку</h2><h3>Слоты сохранения</h3><div id="slots"><div class="slot"><div><b>Слот 1</b><small>Средний · 250 000 · раунд 1 · престиж 0 · $43</small></div><div><button class="sb">Играть</button> <button class="sb">Удалить</button> <button class="sb">Новая (перезапись)</button> </div></div><div class="slot"><div><b>Слот 2</b><small>Средний · 250 000 · раунд 1 · престиж 0 · $23</small></div><div><button class="sb">Играть</button> <button class="sb">Удалить</button> <button class="sb">Новая (перезапись)</button> </div></div><div class="slot"><div><b>Слот 3</b><small>Средний · 250 000 · раунд 1 · престиж 0 · $23</small></div><div><button class="sb">Играть</button> <button class="sb">Удалить</button> <button class="sb">Новая (перезапись)</button> </div></div></div><h3>Размер стога (для новой игры)</h3><div class="sizes" id="sizes"><button class="sb">Малый · 12 000</button><button class="sb on">Средний · 250 000</button><button class="sb">Огромный · 125 млн</button></div><h3>Резервная копия</h3><textarea id="code" rows="3" placeholder="Код сохранения"></textarea><button class="sb" id="exp">Экспорт текущей игры</button> <button class="sb" id="imp">Импорт кода</button><h3>Генератор кода сохранения</h3><div class="gen"><label>Деньги <input id="gc" type="number" value="0" min="0"></label><label>Престиж <input id="gp" type="number" value="0" min="0"></label><label>Раунд (0–30) <input id="gr" type="number" value="0" min="0" max="30"></label><label>Уровень всех улучшений <input id="gl" type="number" value="0" min="0"></label><label>Стог <select id="gs"><option value="12000">Малый · 12 000</option><option value="250000">Средний · 250 000</option><option value="125000000">Огромный · 125 млн</option></select></label></div><button class="sb" id="gen">Сгенерировать код</button><div id="mm" style="min-height:22px;margin:8px 0"></div><button class="sb" id="resume" style="display:none">▶ Продолжить игру</button></div></div>
 </div>
 <script>
 const $=id=>document.getElementById(id),cv=$('c'),x=cv.getContext('2d');
@@ -73,7 +120,9 @@ const N=[
 {id:'s3',g:'Руки',n:'Сила огромных рук',st:'x',op:'add',p:1,max:10,b:220000,k:1.6,d:'+25% захват, быстрее цикл',req:'h3'}];
 let S={cash:0,pts:0,round:0,lv:{},blades:250000,sb:0,sw:0,tt:60,truck:null,ak:{on:true,p:60}},slot=-1,running=false,size=250000;
 const KEY=i=>'needle_slot_'+i;
-let BL=0,BH=W*H-1,BS=0;
+let BL=0,BH=W*H-1,BS=0;let GH=false,curTip=null,GRD=null,qh=0;const CST=[];
+const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(_){}};
+const setT=(id,v)=>{const e=$(id);if(e.textContent!==v)e.textContent=v};
 const MODES=[[12000,'Малый · 12 000'],[250000,'Средний · 250 000'],[125000000,'Огромный · 125 млн']];
 const snap=()=>({S,heap:Array.from(heap,v=>+v.toFixed(3)),needle,nstate,junk:[...junk],buf,roundEarned,mxH});
 const save=()=>{if(slot<0||!running)return;try{localStorage.setItem(KEY(slot),JSON.stringify(snap()))}catch(e){}};
@@ -127,9 +176,9 @@ function digAt(dt,C,px=mx,py=my,rm=1,sm=1){
     for(let cx=Math.max(0,Math.floor(gx-r));cx<=Math.min(W-1,Math.ceil(gx+r));cx++)
       if(Math.hypot(cx+.5-gx,cy+.5-gy)<=r)take(cy*W+cx,sp,C);
 }
-function tick(dt){
+function tick(dt){qTick(dt);
   const C=st('cap',20),T=Math.max(.5,st('cyc',3));
-  if(down)digAt(dt,C);
+  if(down){S.dg=(S.dg||0)+dt;digAt(dt,C)}
   if(S.lv.ak&&S.ak.on&&!down){
     const E=(.15+.05*(S.lv.akp||0))*S.ak.p/100;AU.w+=dt;let d=Math.hypot(AU.tx-AU.x,AU.ty-AU.y);
     if(d<6||AU.w>4){AU.w=0;for(let k=0;k<20;k++){const i=(Math.random()*W*H)|0;if(heap[i]>0){AU.tx=OX+(i%W+.5)*CS;AU.ty=OY+((i/W)|0)*CS+CS/2;break}}}
@@ -154,11 +203,11 @@ function tick(dt){
   return[C,T];
 }
 function draw(C,T,time){
-  const g=x.createLinearGradient(0,0,0,600);g.addColorStop(0,'#9fd3ee');g.addColorStop(.7,'#d9ecd0');g.addColorStop(1,'#7fa650');
-  x.fillStyle=g;x.fillRect(0,0,700,600);
+  if(!GRD){GRD=x.createLinearGradient(0,0,0,600);GRD.addColorStop(0,'#9fd3ee');GRD.addColorStop(.7,'#d9ecd0');GRD.addColorStop(1,'#7fa650')}
+  x.fillStyle=GRD;x.fillRect(0,0,700,600);
   for(let i=0;i<W*H;i++){
     if(!inside[i])continue;const px=OX+(i%W)*CS,py=OY+((i/W)|0)*CS,h=heap[i];
-    if(h>0){const s=Math.min(1,h/mxH);x.fillStyle=`hsl(${44+jit[i]*8},${60+jit[i]*20}%,${28+s*34+jit[i]*6}%)`}
+    if(h>0){const sh=Math.min(1,h/mxH),jb=(jit[i]*6)|0,q=Math.min(31,(sh*31)|0),kk=jb*32+q,jv=(jb+.5)/6;x.fillStyle=CST[kk]||(CST[kk]=`hsl(${44+jv*8},${60+jv*20}%,${28+q/31*34+jv*6}%)`)}
     else x.fillStyle='#7a5a2e';
     x.fillRect(px,py,CS,CS);
     if(S.lv.bin&&(i<BL||i>BH)){x.fillStyle='rgba(15,20,45,.62)';x.fillRect(px,py,CS,CS)}
@@ -272,31 +321,101 @@ $('bpr').onclick=()=>{BL=0;BH=W*H-1;BS=0;refresh()};
 // informatics quiz
 const QB=[
 ['Сколько бит в одном байте?','8',['4','16','10']],
-['1 килобайт = … байт (в двоичной системе)','1024',['1000','100','512']],
-['Какой алгоритм ищет в отсортированном списке, деля его пополам?','Бинарный поиск',['Линейный поиск','Пузырьковая сортировка','Хеширование']],
-['Сколько значений можно закодировать 3 битами?','8',['3','6','9']],
-['Сколько проверок в худшем случае у линейного поиска среди n элементов?','n',['log₂ n','1','n²']],
+['1 килобайт (КБ) в двоичной системе равен…','1024 байта',['1000 байт','100 байт','512 байт']],
+['Сколько разных значений можно закодировать тремя битами?','8',['3','6','9']],
+['Какой алгоритм ищет элемент в отсортированном списке, деля его пополам?','Бинарный поиск',['Линейный поиск','Пузырьковая сортировка','Хеширование']],
+['Сколько проверок в худшем случае делает линейный поиск среди n элементов?','n',['log₂ n','1','n²']],
+['Что быстрее найдёт элемент в отсортированном списке из миллиона чисел?','Бинарный поиск',['Линейный поиск','Одинаково быстро','Сравнить нельзя']],
 ['Что такое алгоритм?','Чёткая последовательность шагов для решения задачи',['Язык программирования','Вид компьютерного вируса','Часть монитора']],
-['Какая память стирается при выключении питания?','ОЗУ (RAM)',['SSD','Жёсткий диск','Флешка']],
+['Какая память стирается при выключении питания?','ОЗУ (оперативная память)',['SSD','Жёсткий диск','Флешка']],
 ['Чему равно 1 + 1 в двоичной системе?','10',['2','11','1']],
-['Что хранит переменная в программе?','Значение, которое можно менять',['Только текст','Название файла','Адрес сайта']]];
+['Что хранит переменная в программе?','Значение, которое можно менять',['Только текст','Название файла','Адрес сайта']],
+['Какой тип данных подходит для слова «привет»?','Строка (string)',['Целое число','Логический','Дробное число']],
+['Чему равно выражение TRUE AND FALSE?','ЛОЖЬ',['ИСТИНА','Ошибка','Пусто']],
+['Чему равно выражение TRUE OR FALSE?','ИСТИНА',['ЛОЖЬ','Ошибка','Пусто']],
+['Чему равно выражение NOT TRUE?','ЛОЖЬ',['ИСТИНА','Ошибка','Пусто']],
+['Что делает цикл в программе?','Повторяет набор команд несколько раз',['Останавливает программу навсегда','Сохраняет файл','Переводит число в двоичную систему']],
+['Что хранит IP-адрес?','Адрес устройства в сети',['Пароль пользователя','Размер файла','Имя программы']],
+['Какое расширение обычно у текстового файла?','.txt',['.exe','.jpg','.mp3']],
+['Какое из устройств относится к устройствам вывода?','Монитор',['Клавиатура','Мышь','Микрофон']],
+['Что такое баг?','Ошибка в программе',['Название языка','Вид процессора','Часть монитора']],
+['Что из этого язык программирования?','Python',['Windows','Excel','Chrome']],
+['Какой пароль надёжнее всех?','Длинный набор разных символов, нигде больше не используемый',['Дата рождения','12345','Имя питомца']],
+['Что делает операционная система?','Управляет устройством и запускает программы',['Рисует мультфильмы','Только защищает от вирусов','Только хранит файлы']],
+['Что произойдёт, если сжать файл ZIP-архивом и распаковать обратно?','Получится точно такой же файл',['Часть данных потеряется','Файл станет вирусом','Размер вырастет вдвое']],
+['Какая единица измерения информации самая большая?','Гигабайт',['Мегабайт','Килобайт','Байт']],
+['Чему равно шестнадцатеричное число FF в десятичной системе?','255',['256','15','16']],
+['Что делает браузер?','Показывает веб-страницы',['Сжимает видео','Чинит жёсткий диск','Раздаёт интернет']],
+['Для чего нужна оперативная память (ОЗУ)?','Хранит данные и программы, с которыми сейчас работает процессор',['Хранит файлы годами','Охлаждает процессор','Выводит изображение']]];
+let deck=[];
 function mkQ(){
   const r=Math.random(),n=5+((Math.random()*27)|0);
-  if(r<.25)return[`Переведи ${n.toString(2)}₂ в десятичную систему`,''+n,[n+1,n-1,n+2].map(String)];
-  if(r<.5)return[`Переведи ${n} в двоичную систему`,n.toString(2),[n^1,n^2,n^4].map(v=>v.toString(2))];
-  if(r<.65){const k=3+((Math.random()*8)|0);return[`Сколько раз нужно разделить пополам диапазон из ${1<<k} элементов, чтобы остался один?`,''+k,[k+1,k-1,k+2].map(String)]}
-  return QB[(Math.random()*QB.length)|0]}
-let QC=null,qk=0,qcd=0;
+  if(r<.12)return[`Переведи ${n.toString(2)}₂ в десятичную систему`,''+n,[n+1,n-1,n+2].map(String)];
+  if(r<.24)return[`Переведи число ${n} в двоичную систему`,n.toString(2),[n^1,n^2,n^4].map(v=>v.toString(2))];
+  if(r<.32){const k=3+((Math.random()*8)|0);return[`Сколько раз нужно разделить пополам диапазон из ${1<<k} элементов, чтобы остался один?`,''+k,[k+1,k-1,k+2].map(String)]}
+  if(r<.40){const k=2+((Math.random()*6)|0);return[`Сколько бит нужно, чтобы закодировать ${1<<k} разных значений?`,''+k,[k+1,k-1,1<<k].map(String)]}
+  if(r<.46){const m=2+((Math.random()*8)|0);return[`Сколько байт в ${m} КБ (в двоичной системе)?`,''+m*1024,[m*1000,m*100,m*8].map(String)]}
+  if(!deck.length)deck=QB.slice().sort(()=>Math.random()-.5);
+  return deck.pop()}
+const QI=300;let QC=null,qk=0,qt=QI,qTO=0;
+function qTick(dt){
+  if(qh>0&&(qh-=dt)<=0)$('qpop').style.display='none';
+  if(QC!==null){qTO-=dt;$('qbb').style.width=Math.max(0,qTO/60*100)+'%';setT('qtm',Math.ceil(Math.max(0,qTO))+' с');if(qTO<=0)ansQ(undefined,true);return}
+  qt-=dt;if(qt<=0)askQ()}
 function askQ(){
   if(QC!==null)return;
-  if(Date.now()<qcd){$('qs').textContent='Следующая задача через '+Math.ceil((qcd-Date.now())/1000)+' с';return}
-  const[t,a,w]=mkQ();QC=a;$('qt').textContent=t;$('qs').textContent='';const o=$('qo');o.innerHTML='';
-  [a,...w].sort(()=>Math.random()-.5).forEach(v=>{const b=document.createElement('button');b.className='sb';b.textContent=v;b.onclick=()=>ansQ(v);o.appendChild(b)})}
-function ansQ(v){
-  if(QC===null)return;const ok=v===QC,rw=Math.round(150*(1+S.round)*(1+.1*S.pts)*(1+.2*Math.min(qk,5)));
-  if(ok){qk++;S.cash+=rw;say('Верно! +$'+f(rw)+' · серия '+qk);beep(880,.1,.06)}else{qk=0;say('Неверно. Правильный ответ: '+QC);beep(200,.2,.06)}
-  QC=null;$('qt').textContent='';$('qo').innerHTML='';qcd=Date.now()+8000;$('qs').textContent=ok?'Серия: '+qk:'';refresh()}
-$('qn').onclick=askQ;
+  const[t,a,w]=mkQ();QC=a;qTO=60;qt=QI;qh=0;$('qt').textContent=t;$('qpop').style.display='block';
+  const o=$('qo');o.innerHTML='';
+  [a,...w].sort(()=>Math.random()-.5).forEach((v,j)=>{const b=document.createElement('button');b.className='sb';b.textContent=(j+1)+'. '+v;b.onclick=()=>ansQ(v);o.appendChild(b)});
+  const k=document.createElement('button');k.className='sb idk';k.textContent='5. 🤷 Не знаю (двойка)';k.onclick=()=>ansQ(null);o.appendChild(k);vib(20);beep(660,.08,.05);refresh()}
+function penalty(p){
+  let c=0;for(let i=0;i<W*H;i++)if(inside[i])c++;
+  const add=S.blades/100*Math.pow(1.5,S.round)*p/c;
+  for(let i=0;i<W*H;i++)if(inside[i]){heap[i]+=add;if(heap[i]>mxH)mxH=heap[i]}}
+function ansQ(v,to){
+  if(QC===null)return;const a=QC,idk=v===null,ok=!to&&!idk&&v===a;let m;
+  if(ok){qk++;S.qs=(S.qs|0)+1;const rw=Math.round(300*(1+S.round)*(1+.1*S.pts)*(1+.2*Math.min(qk-1,5)));S.cash+=rw;m='✅ Верно! +$'+f(rw)+(qk>1?' · серия: '+qk:'');vib(30);beep(880,.1,.06)}
+  else{qk=0;S.dv=(S.dv|0)+1;penalty(.2);m=(to?'⏱ Время вышло. ':'')+'❌ Двойка! В стоге стало больше сена (+20%). Правильный ответ: '+a;vib([60,40,60]);beep(200,.25,.07)}
+  QC=null;say(m);$('qt').textContent=m;qh=8;setT('qtm','');$('qbb').style.width='0';
+  const o=$('qo');o.innerHTML='';const b=document.createElement('button');b.className='sb idk';b.style.color='inherit';b.style.border='1px solid var(--bd)';b.textContent='Ок';b.onclick=()=>{$('qpop').style.display='none';qh=0};o.appendChild(b);save();refresh()}
+$('qnow').onclick=askQ;
+$('upgo').onclick=()=>$('ups').scrollIntoView({behavior:'smooth'});
+$('gx').onclick=()=>{GH=true;guide()};
+$('gk').onclick=()=>{if(curTip){(S.tp=S.tp||[]).push(curTip.k);save();refresh()}};
+$('hbtn').onclick=()=>{GH=false;$('how').open=true;$('how').scrollIntoView({behavior:'smooth'});refresh()};
+const nu=()=>Object.keys(S.lv).length;
+const GS=[
+{t:'Шаг 1. Зажми палец (или мышь) на стоге и води по нему: так ты копаешь сено.',a:'⬇',d:()=>(S.dg|0)>=3},
+{t:'Шаг 2. Сено едет по ленте в переработку, и вверху растут деньги ($). Копай, пока не накопишь на улучшение.',a:'⬆',d:()=>S.cash>=30||nu()>0},
+{t:'Шаг 3. Денег хватает! Пролистни страницу вниз: там улучшения. Нажми на любое яркое, чтобы купить.',a:'⬇',d:()=>nu()>0}];
+const TP=[
+{k:'quiz',c:()=>true,t:'🎓 Каждые 5 минут появится вопрос по информатике. Верно: деньги. Неверно или «Не знаю»: двойка и больше сена в стоге. Игра не останавливается.',a:'🎓'},
+{k:'truck',c:()=>S.cash>=300,t:'🚚 Внизу склад и грузовик: когда приедет грузовик, перетащи тюки в кузов, и получишь деньги.',a:'⬇'},
+{k:'bin',c:()=>S.cash>=1500&&!S.lv.bin,t:'💡 Купи «Бинарный поиск» в улучшениях: он ищет иголку, как в информатике, деля область пополам.',a:'⬇'},
+{k:'binu',c:()=>S.lv.bin&&BS===0,t:'💡 Нажми «Запрос» под стогом. Затемнённые клетки значат, что иголки там точно нет. Копай в светлой области.',a:'⬇'},
+{k:'dU',c:()=>S.cash>=10000&&!S.lv.dU,t:'💡 Металлоискатель ($10 000) пищит рядом с иголкой и с мусором. Копай там, где пищит громче.',a:'⬇'}];
+let MUTE=false;try{MUTE=localStorage.getItem('needle_mute')==='1'}catch(_){}
+const beep0=beep;beep=(...a)=>{if(!MUTE)beep0(...a)};
+$('mubtn').textContent=MUTE?'🔇':'🔊';
+$('mubtn').onclick=()=>{MUTE=!MUTE;$('mubtn').textContent=MUTE?'🔇':'🔊';try{localStorage.setItem('needle_mute',MUTE?'1':'0')}catch(_){}};
+function guide(){
+  const g=$('guide'),s0=GS.find(q=>!q.d());let t=null,a='⬇';curTip=null;
+  if(s0){t=s0.t;a=s0.a}else{const k=TP.find(q=>!(S.tp||[]).includes(q.k)&&q.c());if(k){t=k.t;a=k.a;curTip=k}}
+  g.style.display=(running&&!GH&&t)?'flex':'none';
+  if(t){$('gt').textContent=t;$('ga').textContent=a}
+  $('gk').style.display=curTip?'':'none';
+  $('dh').style.display=(running&&!GH&&s0===GS[0])?'flex':'none'}
+function uiX(){
+  setT('qcd',QC!==null?'сейчас':Math.floor(qt/60)+':'+String(Math.floor(qt%60)).padStart(2,'0'));
+  setT('qok',''+(S.qs|0));setT('qdv',''+(S.dv|0));
+  const av=N.filter(n=>{const l=S.lv[n.id]||0;return l<n.max&&S.cash>=n.b*Math.pow(n.k,l)&&(!n.req||S.lv[n.req])}).length,u=$('upgo');
+  setT('upgo','⬇ Улучшения'+(av?' · можно купить: '+av:''));u.classList.toggle('pulse',av>0);
+  u.style.display=running&&$('ups').getBoundingClientRect().top>innerHeight*.7?'block':'none';guide()}
+addEventListener('visibilitychange',()=>{if(document.hidden)save()});addEventListener('pagehide',save);
+addEventListener('keydown',e=>{
+  if(!running||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  if(QC!==null&&/^[1-9]$/.test(e.key)){const b=$('qo').querySelectorAll('button')[+e.key-1];if(b)b.click()}});
+let sk=0;addEventListener('scroll',()=>{if(sk)return;sk=1;requestAnimationFrame(()=>{sk=0;uiX()})},{passive:true});
 // autoclicker UI
 $('acb').onclick=()=>{S.ak.on=!S.ak.on;refresh()};
 $('acr').oninput=()=>{S.ak.p=+$('acr').value;refresh()};
@@ -317,15 +436,16 @@ const ups=$('ups'),btn={};
   N.filter(n=>n.g===gn).forEach(n=>{const b=document.createElement('button');b.className='up';b.dataset.id=n.id;d.appendChild(b);btn[n.id]=b});
 });
 function buy(id){const n=N.find(q=>q.id===id),l=S.lv[id]||0,c=n.b*Math.pow(n.k,l);
-  if(l<n.max&&S.cash>=c&&(!n.req||S.lv[n.req])){S.cash-=c;S.lv[id]=l+1;refresh()}}
+  if(l<n.max&&S.cash>=c&&(!n.req||S.lv[n.req])){S.cash-=c;S.lv[id]=l+1;say('Куплено: '+n.n+' · уровень '+(l+1));vib(15);refresh()}}
 ups.addEventListener('click',e=>{const b=e.target.closest('button');if(b)buy(b.dataset.id)});
 function refresh(){
-  syncHands();
-  $('cash').textContent='$'+f(S.cash);
-  $('info').textContent=`${f(S.blades)} травинок · Раунд ${S.round+1} · Престиж ${S.pts} (×${(1+.1*S.pts).toFixed(1)}) · сена в стоге ${f(left)}`;
+  syncHands();uiX();
+  setT('cash','$'+f(S.cash));
+  setT('info',`${f(S.blades)} травинок · Раунд ${S.round+1} · Престиж ${S.pts} (×${(1+.1*S.pts).toFixed(1)}) · сена в стоге ${f(left)}`);
   N.forEach(n=>{const b=btn[n.id],l=S.lv[n.id]||0,c=n.b*Math.pow(n.k,l),lock=n.req&&!S.lv[n.req];
-    b.innerHTML=`<b>${n.n}</b> ${l}/${n.max}<small>${lock?'Нужно: '+N.find(q=>q.id===n.req).n:n.d}</small><small>${l>=n.max?'Макс.':'$'+f(c)}</small>`;
-    b.disabled=lock||l>=n.max||S.cash<c});
+    const hh=`<b>${n.n}</b> ${l}/${n.max}<small>${lock?'Нужно: '+N.find(q=>q.id===n.req).n:n.d}</small><small>${l>=n.max?'Макс.':'$'+f(c)}</small>`;
+    if(b._h!==hh){b.innerHTML=hh;b._h=hh}
+    const dd=!!(lock||l>=n.max||S.cash<c);if(b.disabled!==dd)b.disabled=dd});
   $('acp').style.display=S.lv.ak?'':'none';
   $('bsp').style.display=S.lv.bin?'flex':'none';
   if(S.lv.bin){const c=Math.round(30*(1+S.round)*st('bpc',1)),n=BH-BL+1;$('bpb').textContent='Запрос −$'+f(c);$('bpb').disabled=S.cash<c||nstate!=='hid'||n<2;
@@ -375,4 +495,5 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-</script></body></html>
+</script>
+</body></html>
